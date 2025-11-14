@@ -4,9 +4,17 @@ import authRoute from "./routes/auth.route.js";
 import connectDB from "./db/connectDb.js";
 import cookieParser from "cookie-parser";
 import userRoute from "./routes/user.route.js"; 
-
+import cloudinary from "cloudinary" 
+import postRoute from "./routes/post.route.js";
 
 dotenv.config();
+
+cloudinary.config({
+    cloud_name : process.env.CLOUDINARY_CLOUD_NAME,
+    api_key : process.env.CLOUDINARY_API_KEY,
+    api_secret : process.env.CLOUDINARY_API_SECRET
+});
+
 const app = express();
 const PORT = process.env.PORT;  
 
@@ -17,6 +25,7 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoute) 
 app.use("/api/users", userRoute)
+app.use("/api/posts", postRoute)
 
 
 app.listen(PORT, () => {

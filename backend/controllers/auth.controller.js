@@ -61,19 +61,24 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { userName, password } = req.body;
-    const user = await User.findOne({ userName });
-    const isPasswordCorrect = await bcrypt.compare(
-      password,
-      user.password || ""
-    );
 
-    if (!user || !isPasswordCorrect) {
-      return res.status(400).json({ error: "User not found" });
+    if (!userName || !password) {
+      return res.status(400).json({ error: "Username and Password are required" });
+    }
+
+    const user = await User.findOne({ userName });
+    if (!user) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+      return res.status(400).json({ error: "Invalid credentials" });
     }
 
     generateToken(user._id, res);
 
-    res.status(200).json({
+    return res.status(200).json({
       _id: user._id,
       userName: user.userName,
       fullName: user.fullName,
@@ -85,11 +90,13 @@ export const login = async (req, res) => {
       bio: user.bio,
       link: user.link,
     });
+
   } catch (error) {
     console.log(`Error in login controller : ${error}`);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 export const logout = async (req, res) => {
   try {

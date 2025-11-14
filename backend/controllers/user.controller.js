@@ -1,6 +1,7 @@
 import Notification from "../models/notification.model.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
+import cloudinary from 'cloudinary'
 
 
 export const getProfile = async (req, res) => {
@@ -35,8 +36,8 @@ export const followUnFollowUser = async (req, res) => {
     const isFollowing = currentUser.following.includes(id);
     if(isFollowing){
       //unfollow
-      await User.findByIdAndUpdate({_id:id}, {$addToSet:{followers:req.user._id}});
-      await User.findByIdAndUpdate({_id:req.user._id}, {$addToSet:{following:id}})
+      await User.findByIdAndUpdate({_id:id}, {$pull:{followers:req.user._id}});
+      await User.findByIdAndUpdate({_id:req.user._id}, {$pull:{following:id}})
       res.status(200).json({message:"Unfollow successfully"})
     }else{
       //follow
@@ -84,33 +85,78 @@ export const getSuggestedUsers = async (req,res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 }
-
-export const updateUser = async (req,res) =>{
+export const updateUser = async (req, res) => {
   try {
     const userId = req.user._id;
-    const {userName, fullName ,email ,currentPassword ,newPassword ,bio , link} = req.body;
-    const user = await User.findById({_id:userId})
-    if(!user){
-      return res.status(400).json({error:"User not found"})
+    const { userName, fullName, email, currentPassword, newPassword, bio, link } = req.body;
+    let { profileImg, coverImg } = req.body;
+
+    let user = await User.findById(userId);
+    if (!user) {
+      return res.status(400).json({ error: "User not found" });
     }
 
-    if((!newPassword && currentPassword) || (!currentPassword && newPassword)){
-      return res.status(400).json({error:"Please provide both newpassword and currentpassword"})
+    if (userName && userName !== user.userName) {
+      const usernameExists = await User.findOne({ userName });
+      if (usernameExists) {
+        return res.status(400).json({ error: "Username already exists" });
+      }
     }
 
-    if(currentPassword && newPassword){
-      const isMatch = await bcrypt.compare(currentPassword, user.password)
-      if(!isMatch){
-        return res.status(400).json({error:"Current Password is Incorrect"})
+    if (email && email !== user.email) {
+      const emailExists = await User.findOne({ email });
+      if (emailExists) {
+        return res.status(400).json({ error: "Email already exists" });
       }
-      if(newPassword.length<6){
-        return res.status(400).json({error:"Password must have atleast 6 characters"})
+    }
+
+    if (currentPassword || newPassword) {
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ error: "Provide both current and new password" });
       }
+
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ error: "Current password is incorrect" });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ error: "Password must be at least 6 characters" });
+      }
+
       const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(newPassword,salt);
+      user.password = await bcrypt.hash(newPassword, salt);
     }
+
+    if (profileImg) {
+      if (user.profileImg) {
+        await cloudinary.uploader.destroy(user.profileImg.split("/").pop().split(".")[0]);
+      }
+      const uploaded = await cloudinary.uploader.upload(profileImg);
+      user.profileImg = uploaded.secure_url;
+    }
+
+    if (coverImg) {
+      if (user.coverImg) {
+        await cloudinary.uploader.destroy(user.coverImg.split("/").pop().split(".")[0]);
+      }
+      const uploaded = await cloudinary.uploader.upload(coverImg);
+      user.coverImg = uploaded.secure_url;
+    }
+
+    user.fullName = fullName || user.fullName;
+    user.userName = userName || user.userName;
+    user.email = email || user.email;
+    user.bio = bio || user.bio;
+    user.link = link || user.link;
+
+    await user.save();
+    user.password = null;
+
+    return res.status(200).json(user);
+
   } catch (error) {
-    console.log(`Error in Get Updated User Controller : ${error}`);
+    console.log(`Error in updateUser Controller: ${error}`);
     res.status(500).json({ error: "Internal Server Error" });
   }
-}
+};
