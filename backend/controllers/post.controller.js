@@ -225,7 +225,7 @@ export const getFollowingPosts = async (req, res) => {
 export const getUserPost = async (req, res) => {
   try {
     const { username } = req.params;
-    const user = await User.findOne({username})
+    const user = await User.findOne({userName:username})
     
     if(!user){
       return res.status(404).json({error:"User not found"});
@@ -241,9 +241,8 @@ export const getUserPost = async (req, res) => {
                     path: "comments.user",
                     select: "-password"
                   })
-
+    
     return res.status(200).json(posts);
-
   } catch (error) {
     console.log(`Error in getUser Posts controller : ${error}`);
     res.status(500).json({ error: "Internal Server Error" });
