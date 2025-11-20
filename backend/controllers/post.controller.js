@@ -12,7 +12,7 @@ export const createPost = async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(400).json({ error: "User not found" });
+      return res.status(404).json({ error: "User not found" });
     }
 
     if (!text && !img) {
@@ -79,7 +79,7 @@ export const commentPost = async (req, res) => {
     const post = await Post.findOne({ _id: postId });
 
     if (!post) {
-      return res.status(400).json({ error: "Post not found" });
+      return res.status(404).json({ error: "Post not found" });
     }
 
     const comment = {

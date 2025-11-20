@@ -4,8 +4,9 @@ import authRoute from "./routes/auth.route.js";
 import connectDB from "./db/connectDb.js";
 import cookieParser from "cookie-parser";
 import userRoute from "./routes/user.route.js"; 
-import cloudinary from "cloudinary" 
+import cloudinary from "cloudinary"    
 import postRoute from "./routes/post.route.js";
+import notificationRoute from "./routes/notification.route.js";
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoute) 
 app.use("/api/users", userRoute)
 app.use("/api/posts", postRoute)
+app.use("/api/notifications", notificationRoute)
 
 
 app.listen(PORT, () => {

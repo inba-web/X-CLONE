@@ -68,7 +68,7 @@ export const login = async (req, res) => {
 
     const user = await User.findOne({ userName });
     if (!user) {
-      return res.status(400).json({ error: "Invalid credentials" });
+      return res.status(404).json({ error: "Invalid credentials" });
     }
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
