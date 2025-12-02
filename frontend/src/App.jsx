@@ -4,6 +4,7 @@ import SignUpPage from "./pages/auth/signup/SignUpPage";
 import LoginPage from "./pages/auth/login/LoginPage";
 import HomePage from "./pages/home/HomePage";
 import SideBar from "./components/common/SideBar";
+import RightPanel from "./components/common/RightPanel";
 
 
 
@@ -19,6 +20,8 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
       </Routes>
+
+      <RightPanel />
     </div>
   );
 }

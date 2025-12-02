@@ -8,7 +8,7 @@ import { MdHomeFilled } from "react-icons/md";
 
 const sideBar = () => {
     const data = {
-        fullName: "John Doe",
+        fullName: "John Doe",  
         username: "johndoe",
         profileImg: "/avatars/boy1.png",
     };

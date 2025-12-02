@@ -1,9 +1,76 @@
-import React from 'react'
+import { CiImageOn } from "react-icons/ci";
+import { BsEmojiSmileFill } from "react-icons/bs";
+import { useRef, useState } from "react";
+import { IoCloseSharp } from "react-icons/io5";
 
 const CreatePost = () => {
-  return (
-    <div>CreatePost</div>
-  )
-}
+  const [text, setText] = useState("");
+  const [img, setImg] = useState(null);
 
-export default CreatePost
+  const imgRef = useRef(null);
+
+  const isPending = false;
+  const isError = false;
+
+  const data = {
+    profileImg: "/avatars/boy1.png",
+  }
+
+  const handleSubmmit = (e) => {
+    e.preventDefault();
+    alert("Post Created Successfully!");
+  }
+
+  const handleImgChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImg(reader.result);
+      }
+      reader.readAsDataURL(file);
+    }
+  }
+
+  return (
+    <div className="flex items-start gap-4 p-4 border-b border-gray-700">
+      <div className="avatar">
+        <div className="w-8 rounded-full">
+          <img src={data.profileImg || "/avatar-placeholder.png"} alt="" />
+        </div>
+      </div>
+      <form className="flex flex-col w-full gap-2" onSubmit={handleSubmmit}>
+        <textarea className="w-full p-0 text-lg border-none resize-none textarea focus:outline-1" placeholder="What is happening?" value={text} onChange={(e) => setText(e.target.value)} />
+          {
+            img && (
+              <div className="relative mx-auto w-72">
+                <IoCloseSharp
+                  className="absolute top-0 right-0 text-white bg-gray-800 rounded-full cursor-pointer"
+                  onClick={() => {
+                    setImg(null);
+                    imgRef.current.value = null;
+                  }}
+                />
+                <img src={img} className="object-contain w-full mx-auto rounded h-72" alt=""/>
+              </div>
+            )}
+
+            <div className="flex justify-between py-2 border-t border-t-gray-700">
+              <div className="flex items-center gap-1">
+                <CiImageOn
+                  className="w-5 h-5 cursor-pointer fill-primary"
+                  onClick={() => imgRef.current.click()}
+                />
+                <BsEmojiSmileFill className="w-5 h-5 cursor-pointer fill-primwrap-anywhere" />
+              </div>
+              <input type="file" hidden ref={imgRef} onChange={handleImgChange} />
+              <button className="px-4 text-white rounded-full btn btn-primary btn-sm">
+                {isPending ? "Posting..." : "Post"}
+              </button>
+            </div> 
+            {isError && <div className="text-red-500">Error creating post. Please try again.</div>}
+      </form>
+    </div>
+  );
+};
+export default CreatePost;
