@@ -1,25 +1,57 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-
 import XSvg from '../../../components/svgs/X';
-
+import { baseURL } from '../../../constant/url';
 import {MdOutlineMail} from "react-icons/md";
 import {FaUser} from "react-icons/fa";
 import { MdPassword } from 'react-icons/md';
 import {MdDriveFileRenameOutline} from 'react-icons/md';
+import { useMutation } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+import LoadingSpinner from '../../../components/common/LoadingSpinner';
 
 
 const SignUpPage = () => {
     const [formData, setFormData] = useState({
         email: "",
-        username: "",
+        userName: "",
         fullName: "",
         password: "",
     });
 
+    const {mutate:signUp , isPending, isError, error} = useMutation({
+        mutationFn : async ({email,userName,fullName,password}) => {
+            try {
+                const res = await fetch(`${baseURL}/api/auth/signup`,{
+                    method: "POST",
+                    credentials: 'include',
+                    headers :{
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                    },
+                    body: JSON.stringify({email,userName,fullName,password})
+                })
+                
+                const data = await res.json();
+                
+                if(!res.ok){
+                    throw new Error(data.error || "Something went wrong")
+                }
+                console.log("Signup Successful: ", data);
+                return data;
+            } catch (error) {
+                console.log(error)
+                throw error;
+            }
+        },
+        onSuccess: () => {
+            toast.success("User Created Successfully");
+        }
+    });
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Form Data Submitted: ", formData);
+        signUp(formData);
     };  
 
     const handleInputChange = (e) =>{
@@ -28,8 +60,6 @@ const SignUpPage = () => {
             [e.target.name]: e.target.value,
         });
     };
-
-    const isError = false;
 
     return (
         <div className='flex h-screen max-w-screen-xl px-10 mx-auto'>
@@ -58,9 +88,9 @@ const SignUpPage = () => {
                         type="text"
                         className='grow'
                         placeholder='Username' 
-                        name='username'
+                        name='userName'
                         onChange={handleInputChange}
-                        value={formData.username}
+                        value={formData.userName}
                         />
                     </label>
                     <label className='flex items-center flex-1 gap-2 rounded input input-bordered'>
@@ -70,7 +100,7 @@ const SignUpPage = () => {
                         className='grow'
                         placeholder='Full Name'
                         onChange={handleInputChange}
-                        name='username'
+                        name='fullName'
                         value={formData.fullName}
                         />
                     </label>
@@ -87,8 +117,9 @@ const SignUpPage = () => {
                     />
                 </label>
                 <button className='text-white rounded-full btn-primary btn'>Sign Up</button>
+                {isPending ? <LoadingSpinner/> : "Sign Up"}
                 {
-                    isError && <p className='text-red-500'>Something went wrong</p>
+                    isError && <p className='text-red-500'>{error.message}</p>
                 }
                 </form> 
                 <div className='flex flex-col gap-2 mt-4 lg:w-2/3'>

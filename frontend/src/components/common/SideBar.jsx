@@ -5,14 +5,46 @@ import { Link } from "react-router-dom";
 import {BiLogOut} from "react-icons/bi";
 import XSvg from "../svgs/X";
 import { MdHomeFilled } from "react-icons/md";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import toast from "react-hot-toast";
+import { baseURL } from "../../constant/url";
 
 const sideBar = () => {
-    const data = {
-        fullName: "John Doe",  
-        username: "johndoe",
-        profileImg: "/avatars/boy1.png",
-    };
+    const queryClient = useQueryClient(); 
 
+    const {mutate:logOut} = useMutation({
+        mutationFn : async () => {
+            try {
+                const res = await fetch(`${baseURL}/api/auth/logout`, {
+                    method : "POST",
+                    credentials : "include",
+                    headers : {
+                        "Content-Type" : "application/json",
+                    }
+                })
+                const data = await res.json();
+                if(!res.ok){
+                    throw new Error(data.error || "Something went wrong");
+                }
+            } catch (error) {
+                throw error;
+            }
+        },
+        onSuccess : () => {
+            toast.success("Logout successful");
+            queryClient.invalidateQueries({
+                queryKey : ["authUser"]
+            })
+        },
+        onError : () => {
+            toast.error("Logout failed");
+        }
+    });
+
+    const {data, } = useQuery({
+        queryKey : ["authUser"]
+    });
+    
     return (
         <div className="md:flex-[2_2_0] w-18 max-w-52">
             <div className="sticky top-0 left-0 flex flex-col w-20 h-screen border-r border-gray-700 md:lg">
@@ -61,7 +93,10 @@ const sideBar = () => {
                                     <div className="hidden md:block">
                                         <p className="w-20 text-sm font-bold text-white">{data?.username}</p>
                                     </div>
-                                    <BiLogOut className="w-6 h-6"/> 
+                                    <BiLogOut onClick={(e) => {
+                                        e.preventDefault();
+                                        logOut();
+                                    }} className="w-6 h-6"/> 
                                 </div>
                             </Link>
                     )

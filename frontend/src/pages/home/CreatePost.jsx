@@ -43,7 +43,7 @@ const CreatePost = () => {
         <textarea className="w-full p-0 text-lg border-none resize-none textarea focus:outline-1" placeholder="What is happening?" value={text} onChange={(e) => setText(e.target.value)} />
           {
             img && (
-              <div className="relative mx-auto w-72">
+              <div className="relative mx-auto w-72"> 
                 <IoCloseSharp
                   className="absolute top-0 right-0 text-white bg-gray-800 rounded-full cursor-pointer"
                   onClick={() => {

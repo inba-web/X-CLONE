@@ -7,6 +7,9 @@ import userRoute from "./routes/user.route.js";
 import cloudinary from "cloudinary"    
 import postRoute from "./routes/post.route.js";
 import notificationRoute from "./routes/notification.route.js";
+import cors from "cors";
+
+const app = express();
 
 dotenv.config();
 
@@ -16,7 +19,10 @@ cloudinary.config({
     api_secret : process.env.CLOUDINARY_API_SECRET
 });
 
-const app = express();
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+}))
 const PORT = process.env.PORT;  
 
 app.use(express.json()) 
