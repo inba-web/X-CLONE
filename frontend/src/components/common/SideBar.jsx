@@ -38,12 +38,22 @@ const sideBar = () => {
         },
         onError : () => {
             toast.error("Logout failed");
-        }
+        } 
     });
+    
+const { data: authUser } = useQuery({
+  queryKey: ["authUser"],
+  queryFn: async () => {
+    const res = await fetch(`${baseURL}/api/auth/me`, {
+      credentials: "include",
+    });
+    if (!res.ok) return null;
+    return res.json();
+  }
+});
 
-    const {data, } = useQuery({
-        queryKey : ["authUser"]
-    });
+// const {data:authUser} = useQuery({queryKey:["authUser"]})
+
     
     return (
         <div className="md:flex-[2_2_0] w-18 max-w-52">
@@ -71,7 +81,7 @@ const sideBar = () => {
 
                     <li className="flex justify-center md:justify-start">
                         <Link
-                            to={`/profile/${data?.username}`}
+                            to={`/profile/${authUser?.userName}`}
                             className="flex items-center gap-3 py-2 duration-300 rounded-full cursor-pointer ptransition-all hover:bg-stone-900 max-w-fit" >
                                 <FaUser className="w-6 h-6" />
                                 <span className="hidden text-lg md:block">Profile</span>
@@ -79,19 +89,19 @@ const sideBar = () => {
                     </li>
                 </ul> 
                 {
-                    data && (
+                    authUser && (
                         <Link 
-                            to={`/profile/${data?.username }`}
+                            to={`/profile/${authUser?.userName }`}
                             className="flex items-start gap-2 px-4 py-2 mt-auto mb-10 transition-all duration-300 rounded-full hover:bg-[#181818]"
                             >
                                 <div className="avatar hiddedn md:inline-flex">
                                     <div className="w-8 rounded-full">
-                                        <img src={data?.profileImg} alt="" />
+                                        <img src={authUser.profileImg || "/avatar-placeholder.png"} alt="" />
                                     </div>
                                 </div>
                                 <div className="flex justify-between flex-1">
                                     <div className="hidden md:block">
-                                        <p className="w-20 text-sm font-bold text-white">{data?.username}</p>
+                                        <p className="w-20 text-sm font-bold text-white">{authUser?.userName}</p>
                                     </div>
                                     <BiLogOut onClick={(e) => {
                                         e.preventDefault();
