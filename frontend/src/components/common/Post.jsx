@@ -9,7 +9,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { baseURL } from "../../constant/url";
 import LoadingSpinner from "./LoadingSpinner";
 import toast from "react-hot-toast";
-import { formatPostDate } from "../../utils/data";
+import { formatPostDate } from "../../utils/data/index";
 
 const Post = ({ post }) => {
 	const [comment, setComment] = useState("");
@@ -143,9 +143,8 @@ const Post = ({ post }) => {
 							{postOwner.fullName}
 						</Link>
 						<span className='flex gap-1 text-sm text-gray-700'>
-							<Link to={`/profile/${postOwner.username}`}>@{postOwner.username}</Link>
-							<span>·</span>
-							<span>{formattedDate}</span>
+							<Link to={`/profile/${postOwner.userName}`}>@{postOwner.userName}</Link>
+								<span>{formattedDate}</span>
 						</span>
 						{isMyPost && (
 							<span className='flex justify-end flex-1'>
@@ -199,7 +198,7 @@ const Post = ({ post }) => {
 													<div className='flex items-center gap-1'>
 														<span className='font-bold'>{comment.user.fullName}</span>
 														<span className='text-sm text-gray-700'>
-															@{comment.user.username}
+															@{comment.user.userName}
 														</span>
 													</div>
 													<div className='text-sm'>{comment.text}</div>

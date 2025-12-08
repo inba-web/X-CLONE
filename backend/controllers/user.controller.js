@@ -75,7 +75,7 @@ export const getSuggestedUsers = async (req,res) => {
       }
     ]) 
     const filteredUser = users.filter((user) => !userFollowedByMe.following.includes(user._id))
-    const suggestedUsers = filteredUser.slice(0,4);
+    const suggestedUsers = filteredUser.slice(0,users.length-1);
 
     suggestedUsers.forEach((user) => (user.password = null)) 
     res.status(200).json(suggestedUsers);
@@ -85,6 +85,7 @@ export const getSuggestedUsers = async (req,res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 }
+
 export const updateUser = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -97,7 +98,7 @@ export const updateUser = async (req, res) => {
     }
 
     if (userName && userName !== user.userName) {
-      const usernameExists = await User.findOne({ userName });
+      const usernameExists = await User.findOne({ userName }); 
       if (usernameExists) {
         return res.status(400).json({ error: "Username already exists" });
       }

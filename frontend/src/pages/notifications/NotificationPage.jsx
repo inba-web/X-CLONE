@@ -1,45 +1,64 @@
-
 import { Link } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-hot-toast";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
-
+import { baseURL } from '../../constant/url'
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
 
 const NotificationPage = () => {
-	const isLoading = false;
-	const notifications = [
-		{
-			_id: "1",
-			from: {
-				_id: "1",
-				username: "johndoe",
-				profileImg: "/avatars/boy2.png",
-			},
-			type: "follow",
-		},
-		{
-			_id: "2",
-			from: {
-				_id: "2",
-				username: "janedoe",
-				profileImg: "/avatars/girl1.png",
-			},
-			type: "like",
-		},
-	];
+	const queryClient = useQueryClient();
 
-	const deleteNotifications = () => {
-		alert("All notifications deleted");
-	};
+	const { data: notifications = [], isLoading } = useQuery({
+		queryKey: ["notifications"],
+		queryFn: async () => {
+			const res = await fetch(`${baseURL}/api/notifications`, {
+				method: "GET",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+
+			const data = await res.json();
+			if (!res.ok) throw new Error(data.error || "Something went wrong");
+			return Array.isArray(data) ? data : [];
+		},
+	});
+
+	const { mutate: deleteNotifications } = useMutation({
+		mutationFn: async () => {
+			const res = await fetch(`${baseURL}/api/notifications`, {
+				method: "DELETE",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+
+			const data = await res.json();
+			if (!res.ok) throw new Error(data.error || "Something went wrong");
+
+			return data;
+		},
+		onSuccess: () => {
+			toast.success("Notifications deleted successfully");
+			queryClient.invalidateQueries({ queryKey: ["notifications"] });
+		},
+		onError: (error) => {
+			toast.error(error.message);
+		},
+	});
 
 	return (
 		<>
 			<div className='flex-[4_4_0] border-l border-r border-gray-700 min-h-screen'>
 				<div className='flex items-center justify-between p-4 border-b border-gray-700'>
 					<p className='font-bold'>Notifications</p>
-					<div className='dropdown '>
-						<div tabIndex={0} role='button' className='m-1'>
+
+					<div className='dropdown'>
+						<div tabIndex={0} role="button" className='m-1'>
 							<IoSettingsOutline className='w-4' />
 						</div>
 						<ul
@@ -47,31 +66,47 @@ const NotificationPage = () => {
 							className='dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52'
 						>
 							<li>
-								<a onClick={deleteNotifications}>Delete all notifications</a>
+								<a onClick={() => deleteNotifications()}>
+									Delete all notifications
+								</a>
 							</li>
 						</ul>
 					</div>
 				</div>
+
 				{isLoading && (
 					<div className='flex items-center justify-center h-full'>
 						<LoadingSpinner size='lg' />
 					</div>
 				)}
-				{notifications?.length === 0 && <div className='p-4 font-bold text-center'>No notifications 🤔</div>}
-				{notifications?.map((notification) => (
+
+				{!isLoading && notifications.length === 0 && (
+					<div className='p-4 font-bold text-center'>No notifications 🤔</div>
+				)}
+
+				{notifications.map((notification) => (
 					<div className='border-b border-gray-700' key={notification._id}>
 						<div className='flex gap-2 p-4'>
 							{notification.type === "follow" && <FaUser className='w-7 h-7 text-primary' />}
 							{notification.type === "like" && <FaHeart className='text-red-500 w-7 h-7' />}
+
 							<Link to={`/profile/${notification.from.username}`}>
 								<div className='avatar'>
 									<div className='w-8 rounded-full'>
-										<img src={notification.from.profileImg || "/avatar-placeholder.png"} />
+										<img
+											src={notification.from.profileImg || "/avatar-placeholder.png"}
+											alt="avatar"
+										/>
 									</div>
 								</div>
+
 								<div className='flex gap-1'>
-									<span className='font-bold'>@{notification.from.username}</span>{" "}
-									{notification.type === "follow" ? "followed you" : "liked your post"}
+									<span className='font-bold'>
+										@{notification.from.username}
+									</span>
+									{notification.type === "follow"
+										? "followed you"
+										: "liked your post"}
 								</div>
 							</Link>
 						</div>
@@ -81,4 +116,5 @@ const NotificationPage = () => {
 		</>
 	);
 };
+
 export default NotificationPage;
