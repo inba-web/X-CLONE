@@ -1,4 +1,3 @@
-
 const LoadingSpinner = ({ size = "md" }) => {
 	const sizeClass = `loading-${size}`;
 

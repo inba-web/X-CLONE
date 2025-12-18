@@ -2,8 +2,6 @@ import toast from "react-hot-toast";
 import { baseURL } from "../constant/url";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-
-
 const useFollow = () => {
     const queryClient = useQueryClient();
     const { mutate: follow, isPending } = useMutation({
