@@ -15,7 +15,7 @@ export const signup = async (req, res) => {
     const existingUserName = await User.findOne({ userName });
 
     if (existingEmail || existingUserName) {
-      res.status(400).json({ error: "Already Existing User or Email" });
+      return res.status(400).json({ error: "Already Existing User or Email" });
     }
     if (password.length < 6) {
       return res
@@ -50,11 +50,11 @@ export const signup = async (req, res) => {
         link: newUser.link,
       });
     } else {
-      res.status(400).json({ error: "Invalid user data" });
+      return res.status(400).json({ error: "Invalid user data" });
     }
   } catch (error) {
     console.log(`Error in signup controller : ${error}`);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
