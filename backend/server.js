@@ -8,7 +8,7 @@ import connectDB from "./db/connectDb.js";
 import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
 import postRoute from "./routes/post.route.js";
-import notificationRoute from "./routes/notification.route.js";
+import notificationRoute from "./routes/notification.route.js"; 
 
 dotenv.config();
 
