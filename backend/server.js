@@ -33,7 +33,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",       
-      "https://x-social-qldo.onrender.com" 
+      "https://x-social-qldo.onrender.com/" 
     ],
     credentials: true,
   })
