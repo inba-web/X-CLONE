@@ -1,5 +1,4 @@
 import { React, useState } from 'react';
-
 import Posts from '../../components/common/Posts';
 import CreatePost from './CreatePost';
 
@@ -18,7 +17,7 @@ const HomePage = () => {
           >
             For You
             {feedType === 'forYou' && (
-              <div className="absolute bottom-0 w-10 h-1 rounded-full bg-primary"></div>
+              <div className="absolute bottom-0 w-10 h-1 rounded-full bg-primary"></div> 
             )}
           </div>
 

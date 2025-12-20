@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 import XSvg from '../../../components/svgs/X';
-import {FaUser} from "react-icons/fa";
+import { FaUser } from "react-icons/fa";
 import { MdPassword } from "react-icons/md";
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { baseURL } from '../../../constant/url';
@@ -15,29 +15,26 @@ const LoginPage = () => {
         password: "",
     });
 
-    const queryClient = useQueryClient();
+    const queryClient = useQueryClient(); 
     const { mutate: logIn, isPending, isError, error } = useMutation({
         mutationFn: async ({ userName, password }) => {
-            try {
-                const res = await fetch(`${baseURL}/api/auth/login`, {
-                    method: "POST",
-                    credentials: "include",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json",
-                    },
-                    body: JSON.stringify({ userName, password })
-                })
+            const res = await fetch(`${baseURL}api/auth/login`, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                },
+                body: JSON.stringify({ userName, password })
+            })
 
-                const data = await res.json();
+            const data = await res.json();
 
-                if (!res.ok) {
-                    throw new Error(data.error || "Something went wrong");
-                }
-
-            } catch (error) {
-                throw error;
+            if (!res.ok) {
+                throw new Error(data.error || "Something went wrong");
             }
+
+            return data;
         },
         onSuccess: () => {
             toast.success("Login Successful");
@@ -70,7 +67,7 @@ const LoginPage = () => {
                     <XSvg className='w-24 lg:hidden fill-white' />
                     <h1 className='text-4xl font-extrabold text-white'>{"Let's "}go.</h1>
                     <label className='flex items-center gap-2 rounded input input-bordered'>
-                        <FaUser/>
+                        <FaUser />
                         <input
                             type='text'
                             placeholder='Username'
@@ -93,7 +90,7 @@ const LoginPage = () => {
                         />
                     </label>
                     <button className='text-white rounded-full btn btn-primary'>Login</button>
-                    {isPending ? <LoadingSpinner/> : "Logged In"}
+                    {isPending ? <LoadingSpinner /> : "Logged In"}
                     {
                         isError && (
                             <p className='text-red-500'>{error.message}</p>

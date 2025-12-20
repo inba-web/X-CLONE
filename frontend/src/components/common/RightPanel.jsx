@@ -2,88 +2,84 @@ import React from 'react';
 import RightPanelSkeleton from '../skeletons/RightPanelSkeleton';
 import { USERS_FOR_RIGHT_PANEL } from '../../utils/db/dummy';
 import { Link } from 'react-router-dom';
-import {useQuery} from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { baseURL } from "../../constant/url";
 import useFollow from '../../hooks/useFollow';
 import LoadingSpinner from '../common/LoadingSpinner';
 
 
 const RightPanel = () => {
-    const {data : suggestedUsers, isLoading} = useQuery({
-        queryKey : ["suggestedUsers"],
-        queryFn : async () => {
-            try {
-                const res = await fetch(`${baseURL}/api/users/suggested`,{
-                    method : "GET",
-                    credentials : "include",
-                    headers : {
-                        "Content-Type" : "application/json" 
-                    } 
-                })
-                const data = await res.json(); 
-                if(!res.ok){
-                    throw new Error(data.error || "Something went wrong");
+    const { data: suggestedUsers, isLoading } = useQuery({
+        queryKey: ["suggestedUsers"],
+        queryFn: async () => {
+            const res = await fetch(`${baseURL}api/users/suggested`, {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
                 }
-                return data;
-            } catch (error) {
-                throw error;
+            })
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.error || "Something went wrong");
             }
+            return data;
         }
     })
 
-    const {follow, isPending} = useFollow(); 
-    
-    if(suggestedUsers?.length === 0){
-        return(
+    const { follow, isPending } = useFollow();
+
+    if (suggestedUsers?.length === 0) {
+        return (
             <div className="w-0 md:w-64"></div>
         )
     }
-    
-  return (
-    <div className='hidden mx-2 my-4 lg:block'>
-        <div className='bg-[#16181C] p-4 rounded-md sticky top-2'>
-            <p className='font-bold'>Who to follow</p>
-            <div className='flex flex-col gap-4'>
-                {
-                    isLoading && (
-                        <>
-                            <RightPanelSkeleton />
-                            <RightPanelSkeleton />
-                            <RightPanelSkeleton />
-                            <RightPanelSkeleton />  
-                        </> 
-                    ) 
-                }
-                {
-                    !isLoading && 
-                        suggestedUsers?.map((user) => 
+
+    return (
+        <div className='hidden mx-2 my-4 lg:block'>
+            <div className='bg-[#16181C] p-4 rounded-md sticky top-2'>
+                <p className='font-bold'>Who to follow</p>
+                <div className='flex flex-col gap-4'>
+                    {
+                        isLoading && (
+                            <>
+                                <RightPanelSkeleton />
+                                <RightPanelSkeleton />
+                                <RightPanelSkeleton />
+                                <RightPanelSkeleton />
+                            </>
+                        )
+                    }
+                    {
+                        !isLoading &&
+                        suggestedUsers?.map((user) =>
                             <Link to={`/profile/${user.userName}`} className='flex items-center justify-between gap-4' key={user._id}>
                                 <div className='flex gap-2 itmes-center'>
                                     <div className='avatar'>
                                         <div className='w-8 rounded-full'>
-                                            <img src={user.profileImg || "/avatar-placeholder.png"}  alt=""/>
+                                            <img src={user.profileImg || "/avatar-placeholder.png"} alt="" />
                                         </div>
                                     </div>
                                     <div className='flex flex-col'>
                                         <span className='font-semibold tracking-tight truncate w-28'>{user.fullName}</span>
                                         <span className='text-sm text-slate-500'>@{user.userName}</span>
                                     </div>
-                                </div> 
+                                </div>
                                 <div>
-                                    <button className='text-black bg-white rounded-full btn hover:bg-white hover:opacity-90 btn-sm ' onClick={(e) =>{
+                                    <button className='text-black bg-white rounded-full btn hover:bg-white hover:opacity-90 btn-sm ' onClick={(e) => {
                                         e.preventDefault()
                                         follow(user._id)
-                                        }}>
-                                        {isPending ? <LoadingSpinner size="sm"/> : "Follow"} 
-                                    </button> 
+                                    }}>
+                                        {isPending ? <LoadingSpinner size="sm" /> : "Follow"}
+                                    </button>
                                 </div>
                             </Link>
                         )
-                } 
+                    }
+                </div>
             </div>
         </div>
-    </div>
-  )
+    )
 }
 
 export default RightPanel

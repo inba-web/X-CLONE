@@ -3,7 +3,7 @@ import { BiRepost } from "react-icons/bi";
 import { FaRegHeart } from "react-icons/fa";
 import { FaRegBookmark } from "react-icons/fa6";
 import { FaTrash } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { baseURL } from "../../constant/url";
@@ -16,62 +16,54 @@ const Post = ({ post }) => {
 	const postOwner = post.user;
 
 	const { data: authUser } = useQuery({ queryKey: ["authUser"] });
-	const queryClient = useQueryClient(); 
+	const queryClient = useQueryClient();
 	const { mutate: deletePost, isPending: isDeleting, } = useMutation({
 		mutationFn: async () => {
-			try {
-				const res = await fetch(`${baseURL}/api/posts/${post._id}`, {
-					method: "DELETE",
-					credentials: "include",
-					headers: {
-						"Content-Type": "application/json"
-					}
-				})
-				const data = await res.json()
-				if (!res.ok) {
-					throw new Error(data.error || "Something went wrong")
+			const res = await fetch(`${baseURL}api/posts/${post._id}`, {
+				method: "DELETE",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json"
 				}
-				return data;
-			} catch (error) {
-				throw error;
+			})
+			const data = await res.json()
+			if (!res.ok) {
+				throw new Error(data.error || "Something went wrong")
 			}
+			return data;
 		},
 		onSuccess: () => {
 			toast.success("Post Deleted Successfully!")
 			queryClient.invalidateQueries({ queryKey: ["posts"] })
 		}
 	});
-	
+
 	const isLiked = authUser && post.likes.includes(authUser._id);
 
 	const { mutate: likePost, isPending: isLiking } = useMutation({
 		mutationFn: async () => {
-			try {
-				const res = await fetch(`${baseURL}/api/posts/like/${post._id}`, {
-					method: "POST",
-					credentials: "include",
-					headers: {
-						"Content-Type": "application/json"
-					}
-				})
-				const data = await res.json();
-				if (!res.ok) {
-					throw new Error(data.error | "Something went wrong")
+			const res = await fetch(`${baseURL}api/posts/like/${post._id}`, {
+				method: "POST",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json"
 				}
-				return data;
-			} catch (error) {
-				throw error;
+			})
+			const data = await res.json();
+			if (!res.ok) {
+				throw new Error(data.error | "Something went wrong")
 			}
+			return data;
 		},
 		onSuccess: (updatedLikes) => {
 			toast.success("Post Liked")
 			// queryClient.invalidateQueries({ queryKey: ["posts"] })
 			queryClient.setQueryData(["posts"], (oldData) => {
 				return oldData.map((p) => {
-					if(p._id === post._id){
-						return {...p, likes : updatedLikes}
+					if (p._id === post._id) {
+						return { ...p, likes: updatedLikes }
 					}
-					return p; 
+					return p;
 				})
 			})
 		},
@@ -80,36 +72,32 @@ const Post = ({ post }) => {
 		}
 	})
 
-	const {mutate : commentPost, isPending : isCommenting} = useMutation({
-		mutationFn : async () => {
-			try {
-				const res = await fetch(`${baseURL}/api/posts/comment/${post._id}`,{
-					method : "POST",
-					credentials : "include",
-					headers : {
-						"Content-Type" : "application/json"
-					},
-					body : JSON.stringify({text:comment})
-				})
-				const data = await res.json();
-				if(!res.ok){
-					throw new Error(data.error || "Something went wrong");
-				}
-				return data;
-			} catch (error) {
-				throw error;
+	const { mutate: commentPost, isPending: isCommenting } = useMutation({
+		mutationFn: async () => {
+			const res = await fetch(`${baseURL}api/posts/comment/${post._id}`, {
+				method: "POST",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({ text: comment })
+			})
+			const data = await res.json();
+			if (!res.ok) {
+				throw new Error(data.error || "Something went wrong");
 			}
+			return data;
 		},
-		onSuccess : () => {
+		onSuccess: () => {
 			toast.success("Comment Posted Successfully");
 			setComment("");
-			queryClient.invalidateQueries({queryKey : ["posts"]});
+			queryClient.invalidateQueries({ queryKey: ["posts"] });
 		},
-		onError : (error) => {	
+		onError: (error) => {
 			toast.error(error.message);
 		}
 	});
-	
+
 	const isMyPost = (authUser._id === post.user._id);
 
 	const formattedDate = formatPostDate(post.createdAt);
@@ -120,7 +108,7 @@ const Post = ({ post }) => {
 
 	const handlePostComment = (e) => {
 		e.preventDefault();
-		if(isCommenting) return;
+		if (isCommenting) return;
 		commentPost();
 	};
 
@@ -144,7 +132,7 @@ const Post = ({ post }) => {
 						</Link>
 						<span className='flex gap-1 text-sm text-gray-700'>
 							<Link to={`/profile/${postOwner.userName}`}>@{postOwner.userName}</Link>
-								<span>{formattedDate}</span>
+							<span>{formattedDate}</span>
 						</span>
 						{isMyPost && (
 							<span className='flex justify-end flex-1'>

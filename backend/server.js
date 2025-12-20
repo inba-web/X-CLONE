@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import path from "path";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import cloudinary from "cloudinary"; 
+import { v2 as cloudinary } from "cloudinary"; 
 import connectDB from "./db/connectDb.js";  
 import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
@@ -20,7 +20,7 @@ if (
   !process.env.CLOUDINARY_API_KEY ||
   !process.env.CLOUDINARY_API_SECRET
 ) {
-  throw new Error("❌ Cloudinary environment variables are missing");
+  throw new Error("Cloudinary environment variables are missing");
 }
 
 cloudinary.config({
@@ -29,12 +29,15 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// app.use(
-//   cors({
-//     origin: process.env.CLIENT_URL,
-//     credentials: true,
-//   })
-// );
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",       
+      "https://x-social-qldo.onrender.com" 
+    ],
+    credentials: true,
+  })
+);
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
@@ -57,10 +60,10 @@ if (process.env.NODE_ENV === "production") {
 
 const PORT = process.env.PORT || 5000;
 
-connectDB()
+connectDB() 
   .then(() => {
     app.listen(PORT, () => {
-      console.log(` Server running on port ${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
   })
   .catch((err) => {

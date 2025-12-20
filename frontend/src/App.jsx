@@ -8,48 +8,45 @@ import RightPanel from "./components/common/RightPanel";
 import NotificationPage from "./pages/notifications/NotificationPage";
 import ProfilePage from "./pages/profile/ProfilePage";
 import { Toaster } from "react-hot-toast";
-import { useQuery } from "@tanstack/react-query"; 
+import { useQuery } from "@tanstack/react-query";
 import { baseURL } from "./constant/url";
 import LoadingSpinner from "./components/common/LoadingSpinner";
 
 
 
 const App = () => {
-  const { data : authUser, isLoading } = useQuery({
-    queryKey : ["authUser"],
-    queryFn : async() => {
-      try { 
-        const res = await fetch(`${baseURL}/api/auth/me`, {
-          method : "GET",
-          credentials : "include",
-          headers : {
-            "Content-Type" : "application/json",
-          }
-        })
-        const data = await res.json();
-        if(data.error){
-          return null;
+  const { data: authUser, isLoading } = useQuery({
+    queryKey: ["authUser"],
+    queryFn: async () => {
+      const res = await fetch(`${baseURL}api/auth/me`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
         }
-        if(!res.ok){
-          throw new Error(data.error || "Something went wrong");
-        } 
-        console.log("Auth User:", data);
-        return data;
-      } catch (error) {
-        throw error;
-      } 
+      })
+      const data = await res.json();
+      if (data.error) {
+        return null;
+      }
+      if (!res.ok) {
+        throw new Error(data.error || "Something went wrong");
+      }
+      console.log("Auth User:", data);
+      console.log("Link : ",baseURL);
+      return data;
     },
-    retry : false
+    retry: false
   })
 
-  if(isLoading){
-    return(
+  if (isLoading) {
+    return (
       <div className="flex items-center justify-center h-screen">
-        <LoadingSpinner size="lg"/>
-      </div> 
-    ) 
+        <LoadingSpinner size="lg" />
+      </div>
+    )
   }
-  
+
   return (
     <div className="flex max-w-6xl mx-auto">
 
@@ -57,13 +54,13 @@ const App = () => {
 
 
       <Routes>
-        <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/login" />} /> 
-        <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to="/"/> } />
-        <Route path="/signup" element={!authUser ? <SignUpPage /> : <Navigate to="/"/>} />
-        <Route path="/notifications" element={authUser ? <NotificationPage /> : <Navigate to="/login"/>} />
-        <Route path="/profile/:username" element={authUser ? <ProfilePage /> : <Navigate to="/login"/>} />
+        <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/login" />} />
+        <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to="/" />} />
+        <Route path="/signup" element={!authUser ? <SignUpPage /> : <Navigate to="/" />} />
+        <Route path="/notifications" element={authUser ? <NotificationPage /> : <Navigate to="/login" />} />
+        <Route path="/profile/:username" element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
       </Routes>
-      {authUser && <RightPanel /> }
+      {authUser && <RightPanel />}
       <Toaster />
     </div>
   );

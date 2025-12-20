@@ -14,26 +14,23 @@ const CreatePost = () => {
   const imgRef = useRef(null);
 
   const { data: authUser } = useQuery({ queryKey: ["authUser"] })
-  
+
   const queryClient = useQueryClient();
   const { mutate: CreatePost, isPending, isError, error } = useMutation({
     mutationFn: async ({ text, img }) => {
-      try { 
-        const res = await fetch(`${baseURL}/api/posts/create`, {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ text, img })
-        })
-        const data = await res.json()
-        if (!res.ok) {
-          throw new Error(data.error || "Something went wrong");
-        }
-      } catch (error) {
-        throw error;
+      const res = await fetch(`${baseURL}api/posts/create`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ text, img })
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        throw new Error(data.error || "Something went wrong");
       }
+      return data;
     },
     onSuccess: () => {
       setImg(null);
@@ -44,9 +41,7 @@ const CreatePost = () => {
   })
 
 
-  const data = {
-    profileImg: "/avatars/boy1.png",
-  }
+
 
   const handleSubmmit = (e) => {
     e.preventDefault();
@@ -97,7 +92,7 @@ const CreatePost = () => {
           </div>
           <input type="file" hidden ref={imgRef} onChange={handleImgChange} />
           <button className="px-4 text-white rounded-full btn btn-primary btn-sm">
-            {isPending ? <LoadingSpinner size="sm"/> : "Post"}
+            {isPending ? <LoadingSpinner size="sm" /> : "Post"}
           </button>
         </div>
         {isError && <div className="text-red-500">{error.message}</div>}

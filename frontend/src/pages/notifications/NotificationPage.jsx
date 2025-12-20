@@ -13,7 +13,7 @@ const NotificationPage = () => {
 	const { data: notifications = [], isLoading } = useQuery({
 		queryKey: ["notifications"],
 		queryFn: async () => {
-			const res = await fetch(`${baseURL}/api/notifications`, {
+			const res = await fetch(`${baseURL}api/notifications`, {
 				method: "GET",
 				credentials: "include",
 				headers: {
@@ -29,7 +29,7 @@ const NotificationPage = () => {
 
 	const { mutate: deleteNotifications } = useMutation({
 		mutationFn: async () => {
-			const res = await fetch(`${baseURL}/api/notifications`, {
+			const res = await fetch(`${baseURL}api/notifications`, {
 				method: "DELETE",
 				credentials: "include",
 				headers: {

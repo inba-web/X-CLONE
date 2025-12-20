@@ -14,7 +14,7 @@ const Sidebar = () => {
 
   const { mutate: logOut } = useMutation({
     mutationFn: async () => {
-      const res = await fetch(`${baseURL}/api/auth/logout`, {
+      const res = await fetch(`${baseURL}api/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
@@ -30,7 +30,7 @@ const Sidebar = () => {
   const { data: authUser } = useQuery({
     queryKey: ["authUser"],
     queryFn: async () => {
-      const res = await fetch(`${baseURL}/api/auth/me`, {
+      const res = await fetch(`${baseURL}api/auth/me`, {
         credentials: "include",
       });
       if (!res.ok) return null;
@@ -44,7 +44,7 @@ const Sidebar = () => {
   return (
     <aside className="flex flex-col h-screen sticky top-0 border-r border-gray-700
                       w-16 md:w-64 px-2">
-      
+
       {/* Logo */}
       <Link to="/" className="flex justify-center md:justify-start px-3 py-4">
         <XSvg className="w-8 h-8 fill-white" />

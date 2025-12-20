@@ -5,52 +5,48 @@ import { POSTS } from '../../utils/db/dummy'
 import { baseURL } from '../../constant/url'
 import { useQuery } from '@tanstack/react-query'
 
-const Posts = ({ feedType,username,userId }) => {
+const Posts = ({ feedType, username, userId }) => {
 
   const getPostEndPoint = () => {
-    switch(feedType){
-      case "forYou" :
-        return `${baseURL}/api/posts/all`;
+    switch (feedType) {
+      case "forYou":
+        return `${baseURL}api/posts/all`;
       case "following":
-        return `${baseURL}/api/posts/following`;
+        return `${baseURL}api/posts/following`;
       case "posts":
-        return `${baseURL}/api/posts/user/${username}`;
+        return `${baseURL}api/posts/user/${username}`;
       case "likes":
-        return `${baseURL}/api/posts/likes/${userId}`;
+        return `${baseURL}api/posts/likes/${userId}`;
       default:
-        return `${baseURL}/api/posts/all`; 
+        return `${baseURL}api/posts/all`;
     }
   }
 
   const POST_ENDPOINT = getPostEndPoint();
-  
-  const {data : posts,isLoading, refetch, isrefetching} = useQuery({
-    queryKey : ["posts"],
-    queryFn : async () => {
-      try {
-        const res = await fetch(POST_ENDPOINT,{
-          method : "GET",
-          credentials : "include",
-          headers : {
-            "Content-Type" : "application/json" 
-          }
-        })
-        const data = await res.json();
-        if(!res.ok){
-          throw new Error(data.error || "Something went wrong");
+
+  const { data: posts, isLoading, refetch, isrefetching } = useQuery({
+    queryKey: ["posts"],
+    queryFn: async () => {
+      const res = await fetch(POST_ENDPOINT, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
         }
-        return data;
-      } catch (error) {
-        throw error
+      })
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Something went wrong");
       }
+      return data;
     }
   });
 
   useEffect(() => {
     refetch();
-  },[feedType,refetch])
+  }, [feedType, refetch])
 
-  
+
   return (
     <>
       {
